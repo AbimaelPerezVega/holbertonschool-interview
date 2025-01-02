@@ -1,4 +1,9 @@
 #!/usr/bin/python3
+"""
+    This program checks if a collection of boxes
+    has the necessary keys to unlock every box.
+"""
+
 def canUnlockAll(boxes):
     """
     Determines if all boxes can be opened.
