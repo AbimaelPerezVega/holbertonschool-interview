@@ -2,7 +2,7 @@
 #define BINARY_TREES_H
 
 #include <stdlib.h>
-#include <stdio.h>  /* Necesario para binary_tree_print */
+#include <stdio.h> /* Necessary for binary_tree_print */
 
 /**
  * struct binary_tree_s - Binary tree node
