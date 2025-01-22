@@ -1,15 +1,15 @@
+#!/usr/bin/python3
 def minOperations(n):
-    if n <= 0:
-        return 0
+    if n <= 1:
+        return 0  # Impossible to achieve if n <= 1
     
     operations = 0
-    current_length = 1  # Starting with 1 character 'H'
-    clipboard = 0  # Initially clipboard is empty
+    divisor = 2  # Start checking divisors from 2
     
-    while current_length < n:
-        if n % current_length == 0:
-            clipboard = current_length
-        operations += 1
-        current_length += clipboard
+    while n > 1:
+        while n % divisor == 0:  # While divisible, reduce n
+            operations += divisor
+            n //= divisor
+        divisor += 1  # Check next potential divisor
     
     return operations
