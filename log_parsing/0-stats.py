@@ -1,123 +1,90 @@
 #!/usr/bin/python3
-
 """
-Log Parsing Script
+0x06. Log Parsing, task 0. Log parsing
 
-Reads lines from stdin and processes them to compute:
-- The total file size from valid log entries.
-- The count of different HTTP status codes (200, 301, 400, 401, 403, 404, 405, 500).
+Parses a log of HTTP GET request results from stdin to tabulate the total
+counts of status codes appearing in each response, and the total file size
+across all requests.
 
-The script prints statistics:
-- After processing every 10 valid lines.
-- Upon receiving a keyboard interruption (CTRL + C).
-- After processing all input, even if the file is empty.
+Example of expected log line input:
+128.230.61.246 - [2017-02-05 23:31:23.258076] \
+"GET /projects/260 HTTP/1.1" 301 292
 
-Expected log format:
-<IP Address> - [<date>] "GET /projects/260 HTTP/1.1" <status code> <file size>
-
-If the format does not match, the line is skipped.
+Fields:
+<IP Address> - [<date>] "<GET request>" <response status code> <file size>
 """
 
-import sys
-import signal
-import re
 
-# Regular expression pattern for valid log lines
-log_pattern = re.compile(
-    r'^(\S+) - \[.*?\] "GET /projects/260 HTTP/1.1" (\d{3}) (\d+)$'
-)
-
-# Dictionary to store counts of specific HTTP status codes
-status_counts = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
-
-# Variable to store the total file size
-total_size = 0
-
-# Line counter
-line_count = 0
-
-
-def signal_handler(sig, frame):
+def print_log_totals(total_file_size, code_counts):
     """
-    Handles keyboard interruption (CTRL + C).
-    Prints statistics before exiting the program.
-    """
-    print_statistics()
-    sys.exit(0)
-
-
-def print_statistics():
-    """
-    Prints accumulated statistics including total file size and count of each status code.
-    Always prints "File size: <total_size>" even if no lines were processed.
-    """
-    print(f"File size: {total_size}")
-    for code in sorted(status_counts.keys()):
-        if status_counts[code] > 0:
-            print(f"{code}: {status_counts[code]}")
-
-
-def process_line(line):
-    """
-    Processes a single log line using a regex pattern.
-    Extracts status code and file size, updating statistics.
+    Prints current totals of file size and status code counts.
 
     Args:
-        line (str): A single log entry from stdin.
-
-    Returns:
-        bool: True if the line was successfully processed, False otherwise.
+        total_file_size (int): cumulative total of bytes received through
+            GET requests in log
+        code_counts (OrderedDict): totals of status codes from repsonses
     """
-    global total_size, line_count
+    print("File size: {}".format(total_file_size))
+    for code in code_counts:
+        if code_counts[code] > 0:
+            print("{}: {}".format(code, code_counts[code]))
 
-    line = line.strip()  # Remove extra spaces/newlines
-    match = log_pattern.match(line)
 
-    if not match:
-        print(f"Skipping invalid line: {line}", file=sys.stderr)  # DEBUG
-        return False
+if __name__ == '__main__':
+    from sys import argv, stdin, stderr
+    from collections import OrderedDict
+    from datetime import datetime
+
+    line_no = 0
+    total_file_size = 0
+    code_counts = OrderedDict.fromkeys([200, 301, 400, 401, 403,
+                                        404, 405, 500], 0)
 
     try:
-        status_code = int(match.group(2))
-        file_size = int(match.group(3))
-    except ValueError:
-        print(f"Skipping due to conversion error: {line}", file=sys.stderr)  # DEBUG
-        return False
+        for line in stdin:
+            line_no += 1
 
-    # Update status count if it is in the valid list
-    if status_code in status_counts:
-        status_counts[status_code] += 1
-    else:
-        print(f"Unexpected status code: {status_code}", file=sys.stderr)  # DEBUG
+            # both ip addresses/URLs allowed, but some lines may be raw text
+            a = line.split('-', 1)
+            if len(a) != 2:
+                # likely not a formatted line
+                continue
 
-    # Update total file size
-    total_size += file_size
+            # checking timestamp
+            b = a[1].split(']')
+            timecode = b[0].lstrip(' [')
+            try:
+                datetime.strptime(timecode, '%Y-%m-%d %H:%M:%S.%f')
+            except:
+                stderr.write("{}: {}: invalid timecode\n".format(
+                    argv[0], line_no))
+                pass
 
-    line_count += 1
-    return True
+            # checking URL
+            c = b[1].split('"')
+            c = c[1:]
+            if c[0] != 'GET /projects/260 HTTP/1.1':
+                stderr.write("{}: {}: unexpected HTTP request\n".format(
+                    argv[0], line_no))
 
+            # prep for status code and file size
+            d = c[1].lstrip(' ')
+            d = d.rstrip('\n')
+            d = d.split(' ')
 
-def main():
-    """
-    Reads log lines from stdin, processes them, and prints statistics
-    after every 10 valid lines or upon a keyboard interruption.
-    Ensures statistics are printed at the end, even if the file is empty.
-    """
-    global line_count
+            # checking status code (invalid codes skipped without error)
+            if d[0].isdecimal():
+                code = int(d[0])
+                code_counts[code] += 1
 
-    # Register signal handler for keyboard interruption
-    signal.signal(signal.SIGINT, signal_handler)
+            # checking file size (invalid sizes skipped without error)
+            if d[1].isdecimal():
+                total_file_size += int(d[1])
 
-    try:
-        for line in sys.stdin:
-            if process_line(line) and line_count % 10 == 0:
-                print_statistics()
-    except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
+            if line_no % 10 == 0:
+                print_log_totals(total_file_size, code_counts)
+        print_log_totals(total_file_size, code_counts)
 
-    # Ensure final statistics are printed, even if no lines were processed
-    print_statistics()
-
-
-if __name__ == "__main__":
-    main()
+    except (KeyboardInterrupt):
+        print_log_totals(total_file_size, code_counts)
+        raise
