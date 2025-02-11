@@ -72,7 +72,7 @@ def process_line(line):
 
     line = line.strip()  # Remove extra spaces/newlines
     match = log_pattern.match(line)
-    
+
     if not match:
         print(f"Skipping invalid line: {line}", file=sys.stderr)  # DEBUG
         return False
@@ -94,7 +94,6 @@ def process_line(line):
     total_size += file_size
 
     line_count += 1
-    print(f"Processed: {line}", file=sys.stderr)  # DEBUG
     return True
 
 
