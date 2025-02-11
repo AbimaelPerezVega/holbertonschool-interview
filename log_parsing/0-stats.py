@@ -9,7 +9,7 @@ Reads lines from stdin and processes them to compute:
 
 The script prints statistics:
 - After processing every 10 valid lines.
-- Upon receiving a keyboard interrupt (CTRL + C).
+- Upon receiving a keyboard interruption (CTRL + C).
 - After processing all input, even if the file is empty.
 
 Expected log format:
@@ -70,15 +70,16 @@ def process_line(line):
     """
     global total_size, line_count
 
-    match = log_pattern.match(line.strip())
+    line = line.strip()  # Remove extra spaces/newlines
+    match = log_pattern.match(line)
     if not match:
-        return False
+        return False  # Skip invalid lines
 
     try:
         status_code = int(match.group(2))
         file_size = int(match.group(3))
     except ValueError:
-        return False  # Ignore lines with incorrect formatting
+        return False  # Skip lines with incorrect formatting
 
     # Update status count if it is in the valid list
     if status_code in status_counts:
