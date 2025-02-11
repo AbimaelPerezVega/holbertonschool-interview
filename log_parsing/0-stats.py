@@ -20,6 +20,12 @@ If the format does not match, the line is skipped.
 
 import sys
 import signal
+import re
+
+# Regular expression pattern for valid log lines
+log_pattern = re.compile(
+    r'^(\S+) - \[.*?\] "GET /projects/260 HTTP/1.1" (\d{3}) (\d+)$'
+)
 
 # Dictionary to store counts of specific HTTP status codes
 status_counts = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
@@ -53,7 +59,8 @@ def print_statistics():
 
 def process_line(line):
     """
-    Processes a single log line, extracts relevant data, and updates statistics.
+    Processes a single log line using a regex pattern.
+    Extracts status code and file size, updating statistics.
 
     Args:
         line (str): A single log entry from stdin.
@@ -63,17 +70,14 @@ def process_line(line):
     """
     global total_size, line_count
 
-    parts = line.strip().split()
-
-    # Ensure the line has at least 7 parts
-    if len(parts) < 7:
+    match = log_pattern.match(line.strip())
+    if not match:
         return False
 
     try:
-        # Extract necessary fields
-        status_code = int(parts[-2])  # Second to last element
-        file_size = int(parts[-1])    # Last element
-    except (ValueError, IndexError):
+        status_code = int(match.group(2))
+        file_size = int(match.group(3))
+    except ValueError:
         return False  # Ignore lines with incorrect formatting
 
     # Update status count if it is in the valid list
