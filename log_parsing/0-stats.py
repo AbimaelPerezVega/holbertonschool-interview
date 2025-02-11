@@ -72,23 +72,29 @@ def process_line(line):
 
     line = line.strip()  # Remove extra spaces/newlines
     match = log_pattern.match(line)
+    
     if not match:
-        return False  # Skip invalid lines
+        print(f"Skipping invalid line: {line}", file=sys.stderr)  # DEBUG
+        return False
 
     try:
         status_code = int(match.group(2))
         file_size = int(match.group(3))
     except ValueError:
-        return False  # Skip lines with incorrect formatting
+        print(f"Skipping due to conversion error: {line}", file=sys.stderr)  # DEBUG
+        return False
 
     # Update status count if it is in the valid list
     if status_code in status_counts:
         status_counts[status_code] += 1
+    else:
+        print(f"Unexpected status code: {status_code}", file=sys.stderr)  # DEBUG
 
     # Update total file size
     total_size += file_size
 
     line_count += 1
+    print(f"Processed: {line}", file=sys.stderr)  # DEBUG
     return True
 
 
