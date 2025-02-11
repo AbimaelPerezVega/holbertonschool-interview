@@ -45,9 +45,7 @@ def print_statistics():
     Prints accumulated statistics including total file size and count of each status code.
     Only prints status codes that have appeared at least once.
     """
-    if total_size > 0:
-        print(f"File size: {total_size}")
-
+    print(f"File size: {total_size}")
     for code in sorted(status_counts.keys()):
         if status_counts[code] > 0:
             print(f"{code}: {status_counts[code]}")
@@ -73,17 +71,10 @@ def process_line(line):
 
     try:
         # Extract necessary fields
-        ip = parts[0]
-        date = parts[2]  # Not used, but ensures correct format
-        request = parts[3] + " " + parts[4] + " " + parts[5]
-        status_code = int(parts[6])
-        file_size = int(parts[7])
+        status_code = int(parts[-2])  # Second to last element
+        file_size = int(parts[-1])    # Last element
     except (ValueError, IndexError):
         return False  # Ignore lines with incorrect formatting
-
-    # Validate request format
-    if request != '"GET /projects/260 HTTP/1.1"':
-        return False
 
     # Update status count if it is in the valid list
     if status_code in status_counts:
@@ -109,15 +100,14 @@ def main():
 
     try:
         for line in sys.stdin:
-            process_line(line)
-            if line_count % 10 == 0 and line_count > 0:
+            if process_line(line) and line_count % 10 == 0:
                 print_statistics()
 
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
 
     # Ensure final statistics are printed for remaining lines
-    if line_count % 10 != 0:
+    if line_count > 0:
         print_statistics()
 
 
