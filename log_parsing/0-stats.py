@@ -10,7 +10,7 @@ Reads lines from stdin and processes them to compute:
 The script prints statistics:
 - After processing every 10 valid lines.
 - Upon receiving a keyboard interrupt (CTRL + C).
-- After processing all input if fewer than 10 lines exist.
+- After processing all input, even if the file is empty.
 
 Expected log format:
 <IP Address> - [<date>] "GET /projects/260 HTTP/1.1" <status code> <file size>
@@ -43,7 +43,7 @@ def signal_handler(sig, frame):
 def print_statistics():
     """
     Prints accumulated statistics including total file size and count of each status code.
-    Only prints status codes that have appeared at least once.
+    Always prints "File size: <total_size>" even if no lines were processed.
     """
     print(f"File size: {total_size}")
     for code in sorted(status_counts.keys()):
@@ -91,7 +91,7 @@ def main():
     """
     Reads log lines from stdin, processes them, and prints statistics
     after every 10 valid lines or upon a keyboard interruption.
-    Ensures statistics are printed at the end if fewer than 10 lines exist.
+    Ensures statistics are printed at the end, even if the file is empty.
     """
     global line_count
 
@@ -102,13 +102,11 @@ def main():
         for line in sys.stdin:
             if process_line(line) and line_count % 10 == 0:
                 print_statistics()
-
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
 
-    # Ensure final statistics are printed for remaining lines
-    if line_count > 0:
-        print_statistics()
+    # Ensure final statistics are printed, even if no lines were processed
+    print_statistics()
 
 
 if __name__ == "__main__":
