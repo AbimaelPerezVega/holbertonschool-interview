@@ -3,6 +3,7 @@
 Module to validate UTF-8 encoding.
 """
 
+
 def validUTF8(data):
     """
     Determines if a given list of integers represents a valid UTF-8 encoding.
@@ -29,7 +30,7 @@ def validUTF8(data):
             # Determine the number of bytes in the current UTF-8 character
             if not (num & MASK1):  # 1-byte character (0xxxxxxx)
                 continue
-            elif (num & (MASK1 >> 1)) == 0:  # Invalid byte (10xxxxxx as a starting byte)
+            elif (num & (MASK1 >> 1)) == 0:
                 return False
             elif (num & (MASK1 >> 2)) == 0:  # 2-byte character (110xxxxx)
                 remaining = 1
@@ -45,16 +46,18 @@ def validUTF8(data):
                 return False
             remaining -= 1
 
-    # If there are remaining expected continuation bytes, the encoding is invalid
     return remaining == 0
 
 # Testing the function with provided test cases
+
+
 if __name__ == "__main__":
     data1 = [65]
     print(validUTF8(data1))  # Expected output: True
-    
-    data2 = [80, 121, 116, 104, 111, 110, 32, 105, 115, 32, 99, 111, 111, 108, 33]
+
+    data2 = [80, 121, 116, 104, 111, 110, 32,
+             105, 115, 32, 99, 111, 111, 108, 33]
     print(validUTF8(data2))  # Expected output: True
-    
+
     data3 = [229, 65, 127, 256]
     print(validUTF8(data3))  # Expected output: False
