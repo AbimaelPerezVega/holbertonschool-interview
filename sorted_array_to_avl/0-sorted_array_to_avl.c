@@ -54,7 +54,7 @@ return (root);
  * @size: Number of elements in the array.
  *
  * Return: Pointer to the root node of
- the created AVL tree, or NULL on failure.
+ * the created AVL tree, or NULL on failure.
  */
 avl_t *sorted_array_to_avl(int *array, size_t size)
 {
