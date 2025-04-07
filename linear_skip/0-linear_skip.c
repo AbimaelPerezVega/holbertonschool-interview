@@ -17,8 +17,7 @@ skiplist_t *linear_skip(skiplist_t *list, int value)
 	/* Step through express lane */
 	while (start->express)
 	{
-		printf("Value checked at index [%lu] =
-            [%d]\n", start->express->index, start->express->n);
+		printf("Value checked at index [%lu] = [%d]\n", start->express->index, start->express->n);
 		if (start->express->n >= value)
 		{
 			end = start->express;
