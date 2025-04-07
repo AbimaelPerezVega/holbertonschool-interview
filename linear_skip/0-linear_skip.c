@@ -1,50 +1,48 @@
 #include "search.h"
 
 /**
- * linear_skip - Searches for a value in a sorted skip list of integers
+ * linear_skip - Searches for a value in a sorted skip list
  * @list: Pointer to the head of the skip list
  * @value: Value to search for
  *
- * Return: Pointer to the first node where value is located, or NULL
+ * Return: Pointer to first node where value is located or NULL
  */
 skiplist_t *linear_skip(skiplist_t *list, int value)
 {
-	skiplist_t *prev, *curr;
+	skiplist_t *start = list, *end = NULL;
 
 	if (!list)
 		return (NULL);
 
-	curr = list;
-	while (curr->express && curr->express->n < value)
+	/* Step through express lane */
+	while (start->express)
 	{
-		printf("Value checked at index [%lu] = [%d]\n", curr->express->index, curr->express->n);
-		curr = curr->express;
+		printf("Value checked at index [%lu] = [%d]\n", start->express->index, start->express->n);
+		if (start->express->n >= value)
+		{
+			end = start->express;
+			break;
+		}
+		start = start->express;
 	}
 
-	/* Set range for linear search */
-	if (curr->express)
+	/* If no express match, go to end of list */
+	if (!end)
 	{
-		prev = curr;
-		curr = curr->express;
-		printf("Value checked at index [%lu] = [%d]\n", curr->index, curr->n);
-		printf("Value found between indexes [%lu] and [%lu]\n", prev->index, curr->index);
-	}
-	else
-	{
-		prev = curr;
-		while (curr->next)
-			curr = curr->next;
-		printf("Value found between indexes [%lu] and [%lu]\n", prev->index, curr->index);
-		curr = prev;
+		end = start;
+		while (end->next)
+			end = end->next;
 	}
 
-	/* Linear search in the identified block */
-	while (curr && curr->index <= prev->index)
+	printf("Value found between indexes [%lu] and [%lu]\n", start->index, end->index);
+
+	/* Linear search in identified block */
+	while (start && start->index <= end->index)
 	{
-		printf("Value checked at index [%lu] = [%d]\n", curr->index, curr->n);
-		if (curr->n == value)
-			return (curr);
-		curr = curr->next;
+		printf("Value checked at index [%lu] = [%d]\n", start->index, start->n);
+		if (start->n == value)
+			return (start);
+		start = start->next;
 	}
 
 	return (NULL);
