@@ -1,44 +1,51 @@
 #include "search.h"
 
 /**
- * linear_skip - Searches for a value in a sorted skip list of integers.
- * @list: Pointer to the head of the skip list to search in.
- * @value: Value to search for.
+ * linear_skip - Searches for a value in a sorted skip list of integers
+ * @list: Pointer to the head of the skip list
+ * @value: Value to search for
  *
- * Return: Pointer to the first node where value is located, or NULL if not found.
+ * Return: Pointer to the first node where value is located, or NULL
  */
 skiplist_t *linear_skip(skiplist_t *list, int value)
 {
-    skiplist_t *current, *express;
+	skiplist_t *prev, *curr;
 
-    if (list == NULL)
-        return NULL;
+	if (!list)
+		return (NULL);
 
-    current = list;
-    express = list->express;
+	curr = list;
+	while (curr->express && curr->express->n < value)
+	{
+		printf("Value checked at index [%lu] = [%d]\n", curr->express->index, curr->express->n);
+		curr = curr->express;
+	}
 
-    while (express != NULL)
-    {
-        printf("Value checked at index [%lu] = [%d]\n", express->index, express->n);
-        
-        if (express->n >= value)
-            break;
+	/* Set range for linear search */
+	if (curr->express)
+	{
+		prev = curr;
+		curr = curr->express;
+		printf("Value checked at index [%lu] = [%d]\n", curr->index, curr->n);
+		printf("Value found between indexes [%lu] and [%lu]\n", prev->index, curr->index);
+	}
+	else
+	{
+		prev = curr;
+		while (curr->next)
+			curr = curr->next;
+		printf("Value found between indexes [%lu] and [%lu]\n", prev->index, curr->index);
+		curr = prev;
+	}
 
-        current = express;
-        express = express->express;
-    }
+	/* Linear search in the identified block */
+	while (curr && curr->index <= prev->index)
+	{
+		printf("Value checked at index [%lu] = [%d]\n", curr->index, curr->n);
+		if (curr->n == value)
+			return (curr);
+		curr = curr->next;
+	}
 
-    printf("Value found between indexes [%lu] and [%lu]\n", current->index, express->index);
-
-    while (current != NULL && current->n < value)
-    {
-        printf("Value checked at index [%lu] = [%d]\n", current->index, current->n);
-        
-        if (current->n == value)
-            return current;
-
-        current = current->next;
-    }
-
-    return NULL;
+	return (NULL);
 }
