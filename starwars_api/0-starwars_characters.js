@@ -19,6 +19,6 @@ request(url, (err, response, body) => {
       printCharacter(index + 1);
     });
   };
-w
+
   printCharacter(0);
 });
