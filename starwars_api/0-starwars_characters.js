@@ -1,24 +1,59 @@
 #!/usr/bin/node
 
 const request = require('request');
-
 const movieId = process.argv[2];
-const url = `https://swapi-api.hbtn.io/api/films/${movieId}/`;
 
-request(url, (err, response, body) => {
-  if (err) return;
+if (!movieId) {
+  console.error('Please provide a movie ID');
+  process.exit(1);
+}
 
-  const characters = JSON.parse(body).characters;
+const filmUrl = `https://swapi-api.hbtn.io/api/films/${movieId}`;
 
-  const printCharacter = (index) => {
-    if (index >= characters.length) return;
+// First, get the film data to retrieve the characters URLs
+request(filmUrl, (error, response, body) => {
+  if (error) {
+    console.error(error);
+    return;
+  }
 
-    request(characters[index], (err2, res2, body2) => {
-      if (err2) return;
-      console.log(JSON.parse(body2).name);
-      printCharacter(index + 1);
+  if (response.statusCode !== 200) {
+    console.error(`Error: Status code ${response.statusCode}`);
+    return;
+  }
+
+  const film = JSON.parse(body);
+  const charactersUrls = film.characters;
+
+  // Function to get character data using Promises
+  const getCharacter = (url) => {
+    return new Promise((resolve, reject) => {
+      request(url, (error, response, body) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        if (response.statusCode !== 200) {
+          reject(`Error: Status code ${response.statusCode}`);
+          return;
+        }
+        resolve(JSON.parse(body));
+      });
     });
   };
 
-  printCharacter(0);
+  // Use async/await to fetch and print characters in order
+  const printCharacters = async () => {
+    try {
+      // Process the characters in their original order
+      for (const url of charactersUrls) {
+        const character = await getCharacter(url);
+        console.log(character.name);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  printCharacters();
 });
