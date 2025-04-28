@@ -7,9 +7,10 @@
  */
 void swap(int *a, int *b)
 {
-    int temp = *a;
-    *a = *b;
-    *b = temp;
+	int temp = *a;
+
+	*a = *b;
+	*b = temp;
 }
 
 /**
@@ -21,30 +22,32 @@ void swap(int *a, int *b)
  */
 void heapify(int *array, size_t size, size_t root, size_t total_size)
 {
-    size_t largest = root;
-    size_t left = 2 * root + 1;
-    size_t right = 2 * root + 2;
+	size_t largest = root;
+	size_t left = 2 * root + 1;
+	size_t right = 2 * root + 2;
+	size_t i;
 
-    if (left < size && array[left] > array[largest])
-        largest = left;
+	if (left < size && array[left] > array[largest])
+		largest = left;
 
-    if (right < size && array[right] > array[largest])
-        largest = right;
+	if (right < size && array[right] > array[largest])
+		largest = right;
 
-    if (largest != root)
-    {
-        swap(&array[root], &array[largest]);
-        // Print the array after each swap
-        for (size_t i = 0; i < total_size; i++)
-        {
-            if (i)
-                printf(", ");
-            printf("%d", array[i]);
-        }
-        printf("\n");
+	if (largest != root)
+	{
+		swap(&array[root], &array[largest]);
 
-        heapify(array, size, largest, total_size);
-    }
+		/* Print the array after each swap */
+		for (i = 0; i < total_size; i++)
+		{
+			if (i)
+				printf(", ");
+			printf("%d", array[i]);
+		}
+		printf("\n");
+
+		heapify(array, size, largest, total_size);
+	}
 }
 
 /**
@@ -54,27 +57,30 @@ void heapify(int *array, size_t size, size_t root, size_t total_size)
  */
 void heap_sort(int *array, size_t size)
 {
-    if (array == NULL || size < 2)
-        return;
+	ssize_t i;
+	size_t j;
 
-    // Build max heap
-    for (ssize_t i = (size / 2) - 1; i >= 0; i--)
-        heapify(array, size, i, size);
+	if (array == NULL || size < 2)
+		return;
 
-    // Extract elements from heap one by one
-    for (ssize_t i = size - 1; i > 0; i--)
-    {
-        swap(&array[0], &array[i]);
+	/* Build max heap */
+	for (i = (size / 2) - 1; i >= 0; i--)
+		heapify(array, size, i, size);
 
-        // Print the array after each swap
-        for (size_t j = 0; j < size; j++)
-        {
-            if (j)
-                printf(", ");
-            printf("%d", array[j]);
-        }
-        printf("\n");
+	/* Extract elements from heap one by one */
+	for (i = size - 1; i > 0; i--)
+	{
+		swap(&array[0], &array[i]);
 
-        heapify(array, i, 0, size);
-    }
+		/* Print the array after each swap */
+		for (j = 0; j < size; j++)
+		{
+			if (j)
+				printf(", ");
+			printf("%d", array[j]);
+		}
+		printf("\n");
+
+		heapify(array, i, 0, size);
+	}
 }
