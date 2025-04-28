@@ -1,17 +1,29 @@
-#include "sort.h"
 #include <stdio.h>
 
 /**
- * heapify - Adjusts the heap to satisfy the heap property
- * @array: Array to heapify
- * @size: Size of the heap
- * @index: Root index of the subtree to heapify
+ * swap - Swap two integers in an array
+ * @a: first integer
+ * @b: second integer
  */
-void heapify(int *array, size_t size, size_t index)
+void swap(int *a, int *b)
 {
-    size_t largest = index;
-    size_t left = 2 * index + 1;
-    size_t right = 2 * index + 2;
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+/**
+ * heapify - Turn a subtree into a max heap
+ * @array: array to heapify
+ * @size: size of heap
+ * @root: root index of the subtree
+ * @total_size: total array size (for printing)
+ */
+void heapify(int *array, size_t size, size_t root, size_t total_size)
+{
+    size_t largest = root;
+    size_t left = 2 * root + 1;
+    size_t right = 2 * root + 2;
 
     if (left < size && array[left] > array[largest])
         largest = left;
@@ -19,37 +31,50 @@ void heapify(int *array, size_t size, size_t index)
     if (right < size && array[right] > array[largest])
         largest = right;
 
-    if (largest != index)
+    if (largest != root)
     {
-        int temp = array[index];
-        array[index] = array[largest];
-        array[largest] = temp;
-        print_array(array, size);
-        heapify(array, size, largest);
+        swap(&array[root], &array[largest]);
+        // Print the array after each swap
+        for (size_t i = 0; i < total_size; i++)
+        {
+            if (i)
+                printf(", ");
+            printf("%d", array[i]);
+        }
+        printf("\n");
+
+        heapify(array, size, largest, total_size);
     }
 }
 
 /**
- * heap_sort - Sorts an array of integers in ascending order using Heap sort algorithm
- * @array: Array to be sorted
- * @size: Size of the array
+ * heap_sort - Sorts an array of integers in ascending order using Heap sort
+ * @array: The array to sort
+ * @size: Number of elements in array
  */
 void heap_sort(int *array, size_t size)
 {
-    // Build heap (rearrange array)
-    for (int i = size / 2 - 1; i >= 0; i--)
-        heapify(array, size, i);
+    if (array == NULL || size < 2)
+        return;
 
-    // One by one extract an element from heap
-    for (int i = size - 1; i > 0; i--)
+    // Build max heap
+    for (ssize_t i = (size / 2) - 1; i >= 0; i--)
+        heapify(array, size, i, size);
+
+    // Extract elements from heap one by one
+    for (ssize_t i = size - 1; i > 0; i--)
     {
-        // Move current root to end
-        int temp = array[0];
-        array[0] = array[i];
-        array[i] = temp;
-        print_array(array, size);
+        swap(&array[0], &array[i]);
 
-        // Call max heapify on the reduced heap
-        heapify(array, i, 0);
+        // Print the array after each swap
+        for (size_t j = 0; j < size; j++)
+        {
+            if (j)
+                printf(", ");
+            printf("%d", array[j]);
+        }
+        printf("\n");
+
+        heapify(array, i, 0, size);
     }
 }
