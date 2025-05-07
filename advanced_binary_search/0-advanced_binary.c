@@ -30,22 +30,23 @@ void print_array(int *array, size_t low, size_t high)
  *
  * Return: The index of the first occurrence of value, or -1 if not found
  */
- int recursive_search(int *array, size_t low, size_t high, int value)
+int recursive_search(int *array, size_t low, size_t high, int value)
 {
     size_t mid;
-
+ 
     if (low > high)
         return (-1);
  
     print_array(array, low, high);
 
     mid = low + (high - low) / 2;
-
+ 
     if (array[mid] == value)
     {
-        if (mid == low || array[mid - 1] != value)
-            return ((int)mid);
-        return (recursive_search(array, low, mid - 1, value)); /* ✅ FIXED LINE */
+        int left = recursive_search(array, low, mid - 1, value); /* ✅ check left */
+        if (left != -1)
+            return (left);
+        return ((int)mid); /* ✅ only return mid if no earlier value */
     }
     else if (array[mid] > value)
     {
