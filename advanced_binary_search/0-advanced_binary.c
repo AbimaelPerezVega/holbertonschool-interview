@@ -2,10 +2,10 @@
 #include <stdio.h>
 
 /**
- * print_array - Prints the elements of an array from a given range
- * @array: The array to print
- * @low: The starting index
- * @high: The ending index
+ * print_array - Prints the array being searched
+ * @array: The array
+ * @low: Start index
+ * @high: End index
  */
 void print_array(int *array, size_t low, size_t high)
 {
@@ -15,56 +15,53 @@ void print_array(int *array, size_t low, size_t high)
 	for (i = low; i <= high; i++)
 	{
 		printf("%d", array[i]);
-		if (i != high)
+		if (i < high)
 			printf(", ");
 	}
 	printf("\n");
 }
 
 /**
- * recursive_search - Recursively searches for the first occurrence of a value
- * @array: Pointer to the first element of the array
- * @low: The starting index of the current search range
- * @high: The ending index of the current search range
- * @value: The value to search for
- *
- * Return: The index of the first occurrence of value, or -1 if not found
+ * recursive_search - Recursively searches for first occurrence
+ * @array: The array
+ * @low: Start index
+ * @high: End index
+ * @value: Target value
+ * Return: Index of first occurrence or -1
  */
 int recursive_search(int *array, size_t low, size_t high, int value)
 {
-    size_t mid;
- 
-    if (low > high)
-        return (-1);
- 
-    print_array(array, low, high);
+	size_t mid;
 
-    mid = low + (high - low) / 2;
- 
-    if (array[mid] == value)
-    {
-        int left = recursive_search(array, low, mid - 1, value); /* ✅ check left */
-        if (left != -1)
-            return (left);
-        return ((int)mid); /* ✅ only return mid if no earlier value */
-    }
-    else if (array[mid] > value)
-    {
-        return (recursive_search(array, low, mid - 1, value));
-    }
-    else
-    {
-        return (recursive_search(array, mid + 1, high, value));
-    }
+	if (low > high)
+		return (-1);
+
+	print_array(array, low, high);
+
+	mid = low + (high - low) / 2;
+
+	if (array[mid] == value)
+	{
+		if (mid == low || array[mid - 1] != value)
+			return ((int)mid);
+		return (recursive_search(array, low, mid, value));
+	}
+	else if (array[mid] > value)
+	{
+		return (recursive_search(array, low, mid - 1, value));
+	}
+	else
+	{
+		return (recursive_search(array, mid + 1, high, value));
+	}
 }
- 
+
 /**
- * advanced_binary - Searches for a value in a sorted array using advanced binary search
- * @array: Pointer to the first element of the array
- * @size: The number of elements in the array
- * @value: The value to search for
- *
- * Return: The index of the first occurrence of value, or -1 if not found
+ * advanced_binary - Entry point to advanced binary search
+ * @array: Pointer to first element
+ * @size: Number of elements in array
+ * @value: Value to search for
+ * Return: Index where value is located or -1
  */
 int advanced_binary(int *array, size_t size, int value)
 {
