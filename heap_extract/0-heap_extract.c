@@ -1,7 +1,8 @@
 #include "binary_trees.h"
 
 /**
- * heapify_down - Moves a node down the heap until it is in the correct position.
+ * heapify_down - Moves a node down the
+    heap until it is in the correct position.
  * @node: Pointer to the node to heapify down.
  */
 void heapify_down(heap_t *node)
