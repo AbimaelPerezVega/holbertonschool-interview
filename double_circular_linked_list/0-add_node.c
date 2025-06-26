@@ -3,75 +3,79 @@
 #include "list.h"
 
 /**
- * create_node - Allocates and initializes a new node
- * @str: The string to duplicate into the new node
- * Return: Pointer to the new node, or NULL on failure
+ * create_node - Create a new list node
+ * @str: String to duplicate
+ *
+ * Return: Pointer to new node or NULL on failure
  */
 static List *create_node(char *str)
 {
-    List *new_node;
-    char *dup_str;
+	List *node;
+	char *dup;
 
-    new_node = malloc(sizeof(List));
-    if (!new_node)
-        return (NULL);
+	node = malloc(sizeof(List));
+	if (!node)
+		return (NULL);
 
-    dup_str = strdup(str);
-    if (!dup_str)
-    {
-        free(new_node);
-        return (NULL);
-    }
+	dup = strdup(str);
+	if (!dup)
+	{
+		free(node);
+		return (NULL);
+	}
 
-    new_node->str = dup_str;
-    new_node->prev = new_node->next = NULL;
-
-    return (new_node);
+	node->str = dup;
+	node->prev = node->next = NULL;
+	return (node);
 }
 
 /**
- * add_node_end - Adds a new node to the end of a double circular linked list
- * @list: A pointer to the pointer of the list head
- * @str: The string to duplicate into the new node
- * Return: Pointer to the new node, or NULL on failure
+ * add_node_end - Add a node at the end of a circular doubly list
+ * @list: Address of head pointer
+ * @str:  String to duplicate
+ *
+ * Return: Address of new node, or NULL on failure
  */
 List *add_node_end(List **list, char *str)
 {
-    List *new_node = create_node(str);
-    List *last;
+	List *new, *last;
 
-    if (!new_node)
-        return (NULL);
+	if (!list)
+		return (NULL);
 
-    if (!list || !(*list))
-    {
-        new_node->next = new_node->prev = new_node;
-        *list = new_node;
-    }
-    else
-    {
-        last = (*list)->prev;
-        last->next = new_node;
-        new_node->prev = last;
-        new_node->next = *list;
-        (*list)->prev = new_node;
-    }
+	new = create_node(str);
+	if (!new)
+		return (NULL);
 
-    return (new_node);
+	if (!*list)			/* empty list → new points to itself */
+	{
+		new->next = new->prev = new;
+		*list = new;
+	}
+	else
+	{
+		last = (*list)->prev;
+		last->next = new;
+		new->prev = last;
+		new->next = *list;
+		(*list)->prev = new;
+	}
+	return (new);
 }
 
 /**
- * add_node_begin - Adds a new node to the beginning of a double circular list
- * @list: A pointer to the pointer of the list head
- * @str: The string to duplicate into the new node
- * Return: Pointer to the new node, or NULL on failure
+ * add_node_begin - Add a node at the beginning of a circular doubly list
+ * @list: Address of head pointer
+ * @str:  String to duplicate
+ *
+ * Return: Address of new node, or NULL on failure
  */
 List *add_node_begin(List **list, char *str)
 {
-    List *new_node = add_node_end(list, str);
+	List *new;
 
-    if (new_node)
-        *list = new_node;
-
-    return (new_node);
+	new = add_node_end(list, str);
+	if (new)
+		*list = new;
+	return (new);
 }

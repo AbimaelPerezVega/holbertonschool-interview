@@ -2,16 +2,16 @@
 #define LIST_H
 
 /**
- * struct List - doubly linked list
- * @str: string - (malloc'ed string)
- * @prev: points to the previous node
- * @next: points to the next node
+ * struct List - Doubly linked list node
+ * @str:  (malloc'ed) string
+ * @prev: Pointer to previous node
+ * @next: Pointer to next node
  */
 typedef struct List
 {
-    char *str;
-    struct List *prev;
-    struct List *next;
+	char *str;
+	struct List *prev;
+	struct List *next;
 } List;
 
 List *add_node_end(List **list, char *str);
