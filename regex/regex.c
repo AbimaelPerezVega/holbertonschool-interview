@@ -20,10 +20,10 @@ int regex_match(const char *str, const char *pattern)
 	int first_match = (*str != '\0' &&
 		(*str == *pattern || *pattern == '.'));
 
-	/* Handle '*' in the pattern */
 	if (*(pattern + 1) == '*')
 	{
-		/* Two options:
+		/*
+		 * Two options:
 		 * 1. Skip the character and '*' -> match zero of that char
 		 * 2. If first match, move str forward but keep pattern
 		 */
